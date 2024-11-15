@@ -38,40 +38,12 @@ class AmelieEconomicModel:
         return capex_total, opex_total
 
     def generate_pie_chart(self, data, title):
-        # Ordina i dati in ordine decrescente per una migliore visualizzazione
-        sorted_data = dict(sorted(data.items(), key=lambda x: x[1], reverse=True))
-        
-        fig, ax = plt.subplots(figsize=(12, 8))
-        
-        # Calcola le percentuali
-        total = sum(sorted_data.values())
-        percentages = [value/total * 100 for value in sorted_data.values()]
-        
-        # Crea il grafico a torta
-        wedges, texts, autotexts = ax.pie(percentages, 
-                                         labels=sorted_data.keys(),
-                                         autopct='%1.1f%%',
-                                         startangle=90,
-                                         pctdistance=0.85,
-                                         labeldistance=1.1)
-        
-        # Personalizza il testo
-        plt.setp(autotexts, size=8, weight="bold")
-        plt.setp(texts, size=8)
-        
-        # Aggiungi una legenda
-        ax.legend(wedges, sorted_data.keys(),
-                 title=title,
-                 loc="center left",
-                 bbox_to_anchor=(1, 0, 0.5, 1))
-        
-        # Assicurati che il grafico si adatti bene
-        plt.tight_layout()
-        
+        fig, ax = plt.subplots(figsize=(10, 8))  # Increased size
+        ax.pie(data.values(), labels=data.keys(), autopct='%1.1f%%', startangle=90)
+        ax.set_title(title, fontsize=16)
         buf = io.BytesIO()
-        plt.savefig(buf, format='png', bbox_inches='tight', dpi=300)
+        plt.savefig(buf, format='png')
         buf.seek(0)
-        plt.close()
         return buf
 
     def generate_table(self, data, title):
@@ -120,8 +92,6 @@ class AmelieEconomicModel:
         return assumptions
 
 # Streamlit App
-st.set_page_config(layout="wide")  # Imposta il layout wide per una migliore visualizzazione
-
 model = AmelieEconomicModel()
 
 # Add scenarios
@@ -161,18 +131,15 @@ st.subheader("Results")
 st.write(f"**Total CapEx:** {capex_total} EUR")
 st.write(f"**Total OpEx:** {opex_total} EUR/batch")
 
-# Visualizzazione dei grafici in colonne separate
-col1, col2 = st.columns(2)
+# CapEx Chart
+st.subheader("CapEx Breakdown")
+capex_chart_buf = model.generate_pie_chart(model.capex, "CapEx Breakdown")
+st.image(capex_chart_buf, caption="CapEx Pie Chart", use_column_width=True)
 
-with col1:
-    st.subheader("CapEx Breakdown")
-    capex_chart_buf = model.generate_pie_chart(model.capex, "CapEx Breakdown")
-    st.image(capex_chart_buf, caption="CapEx Pie Chart", use_column_width=True)
-
-with col2:
-    st.subheader("OpEx Breakdown")
-    opex_chart_buf = model.generate_pie_chart(model.opex, "OpEx Breakdown")
-    st.image(opex_chart_buf, caption="OpEx Pie Chart", use_column_width=True)
+# OpEx Chart
+st.subheader("OpEx Breakdown")
+opex_chart_buf = model.generate_pie_chart(model.opex, "OpEx Breakdown")
+st.image(opex_chart_buf, caption="OpEx Pie Chart", use_column_width=True)
 
 # Display tables
 st.subheader("CapEx Table")
