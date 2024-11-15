@@ -196,73 +196,9 @@ def generate_improved_pie_chart(data, title):
         textprops={'fontsize': 10}  # Font leggibile
     )
 
-    # Aggiunge linee di collegamento per le percentuali piccole
-    for i, (wedge, text) in enumerate(zip(wedges, autotexts)):
-        if values[i] < sum(values) * 0.05:  # Percentuali minori del 5%
-            text.set_horizontalalignment('center')
-            text.set_verticalalignment('center')
 
-    plt.title(title, fontsize=14)
-    plt.axis('equal')  # Mantiene la proporzione
-    plt.tight_layout()
 
-    # Salva il grafico in un buffer
-    buf = BytesIO()
-    plt.savefig(buf, format='png', bbox_inches='tight')
-    buf.seek(0)
-    plt.close()
-    return buf
 
-# Funzione aggiornata per generare il grafico a torta con linee di collegamento e migliore disposizione
-def generate_improved_pie_chart(data, title):
-    import matplotlib.pyplot as plt
-    from io import BytesIO
-
-    # Estrazione valori e etichette
-    values = list(data.values())
-    labels = list(data.keys())
-
-    # Creazione del grafico
-    plt.figure(figsize=(12, 12))
-    wedges, texts, autotexts = plt.pie(
-        values,
-        labels=None,                # Non mostriamo direttamente le etichette
-        autopct='',                 # Non mostriamo inizialmente le percentuali
-        startangle=90,              # Inizio a 90° per bilanciare
-        textprops={'fontsize': 12}, # Font leggibile
-        wedgeprops={'linewidth': 1, 'edgecolor': 'white'}  # Bordo visibile
-    )
-
-    # Aggiunta di linee di collegamento e personalizzazione
-    for i, (wedge, value) in enumerate(zip(wedges, values)):
-        # Posizione centrale del wedge
-        angle = (wedge.theta2 + wedge.theta1) / 2
-        x = wedge.r * 0.8 * plt.cos(angle * plt.pi / 180)
-        y = wedge.r * 0.8 * plt.sin(angle * plt.pi / 180)
-
-        # Aggiunge linee per le percentuali
-        plt.annotate(
-            f'{value / sum(values) * 100:.1f}%',  # Percentuale
-            xy=(x, y),                            # Posizione testo
-            xytext=(1.2 * x, 1.2 * y),            # Posizione spostata
-            arrowprops=dict(arrowstyle="-", color="black", lw=1),
-            ha='center', va='center', fontsize=10
-        )
-
-        # Aggiunge etichette vicino alla linea
-        plt.text(1.5 * x, 1.5 * y, labels[i], fontsize=10, ha='center', va='center')
-
-    # Titolo
-    plt.title(title, fontsize=16)
-    plt.axis('equal')  # Proporzioni circolari
-    plt.tight_layout()
-
-    # Salva il grafico in un buffer
-    buf = BytesIO()
-    plt.savefig(buf, format='png', bbox_inches='tight')
-    buf.seek(0)
-    plt.close()
-    return buf
 
 # Sezione CapEx Chart
 st.subheader("CapEx Breakdown")
