@@ -213,54 +213,48 @@ def generate_improved_pie_chart(data, title):
     plt.close()
     return buf
 
-# Funzione aggiornata per generare il grafico a torta con miglioramenti
+# Funzione aggiornata per generare il grafico a torta con linee di collegamento e migliore disposizione
 def generate_improved_pie_chart(data, title):
     import matplotlib.pyplot as plt
-    import numpy as np
     from io import BytesIO
 
-    # Riordina i dati per alternare percentuali grandi e piccole
-    def reorder_data(values, labels):
-        sorted_indices = np.argsort(values)  # Indici ordinati
-        small_indices = sorted_indices[:len(values)//2]  # Metà più piccoli
-        large_indices = sorted_indices[len(values)//2:]  # Metà più grandi
-
-        # Alterna piccoli e grandi, gestendo lunghezze diverse
-        reordered_indices = []
-        for i in range(max(len(small_indices), len(large_indices))):
-            if i < len(large_indices):
-                reordered_indices.append(large_indices[::-1][i])
-            if i < len(small_indices):
-                reordered_indices.append(small_indices[i])
-        
-        return [values[int(i)] for i in reordered_indices], [labels[int(i)] for i in reordered_indices]
-
+    # Estrazione valori e etichette
     values = list(data.values())
     labels = list(data.keys())
 
-    # Riordina i valori e le etichette
-    values, labels = reorder_data(values, labels)
-
     # Creazione del grafico
-    plt.figure(figsize=(10, 10))
+    plt.figure(figsize=(12, 12))
     wedges, texts, autotexts = plt.pie(
         values,
-        labels=labels,
-        autopct='%1.1f%%',
-        pctdistance=0.8,            # Posizione dei numeri
-        labeldistance=1.2,          # Posizione delle etichette
-        startangle=140,             # Rotazione iniziale per bilanciare
-        textprops={'fontsize': 10}  # Font leggibile
+        labels=None,                # Non mostriamo direttamente le etichette
+        autopct='',                 # Non mostriamo inizialmente le percentuali
+        startangle=90,              # Inizio a 90° per bilanciare
+        textprops={'fontsize': 12}, # Font leggibile
+        wedgeprops={'linewidth': 1, 'edgecolor': 'white'}  # Bordo visibile
     )
 
-    # Aggiunge linee di collegamento per le percentuali piccole
-    for i, (wedge, text) in enumerate(zip(wedges, autotexts)):
-        if values[i] < sum(values) * 0.05:  # Percentuali minori del 5%
-            text.set_horizontalalignment('center')
-            text.set_verticalalignment('center')
+    # Aggiunta di linee di collegamento e personalizzazione
+    for i, (wedge, value) in enumerate(zip(wedges, values)):
+        # Posizione centrale del wedge
+        angle = (wedge.theta2 + wedge.theta1) / 2
+        x = wedge.r * 0.8 * plt.cos(angle * plt.pi / 180)
+        y = wedge.r * 0.8 * plt.sin(angle * plt.pi / 180)
 
-    plt.title(title, fontsize=14)
-    plt.axis('equal')  # Mantiene la proporzione
+        # Aggiunge linee per le percentuali
+        plt.annotate(
+            f'{value / sum(values) * 100:.1f}%',  # Percentuale
+            xy=(x, y),                            # Posizione testo
+            xytext=(1.2 * x, 1.2 * y),            # Posizione spostata
+            arrowprops=dict(arrowstyle="-", color="black", lw=1),
+            ha='center', va='center', fontsize=10
+        )
+
+        # Aggiunge etichette vicino alla linea
+        plt.text(1.5 * x, 1.5 * y, labels[i], fontsize=10, ha='center', va='center')
+
+    # Titolo
+    plt.title(title, fontsize=16)
+    plt.axis('equal')  # Proporzioni circolari
     plt.tight_layout()
 
     # Salva il grafico in un buffer
@@ -279,6 +273,7 @@ st.image(capex_chart_buf, caption="CapEx Pie Chart", use_column_width=True)
 st.subheader("OpEx Breakdown")
 opex_chart_buf = generate_improved_pie_chart(model.opex, "OpEx Breakdown")
 st.image(opex_chart_buf, caption="OpEx Pie Chart", use_column_width=True)
+
 
 
 
