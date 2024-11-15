@@ -88,7 +88,7 @@ class AmelieEconomicModel:
                 if cost in self.opex:
                     self.opex[cost] *= (1 + fluctuation_percentage / 100)
 
-    def get_assumptions(self, scenario_name):
+        def get_assumptions(self, scenario_name):
         assumptions = """
         ### General Assumptions:
         1. Pilot project sized for 10 kg BM per batch.
@@ -99,6 +99,10 @@ class AmelieEconomicModel:
         6. Maintenance and disposal are estimated.
         7. Microwave-assisted thermal treatment considered (source: Aznar, p. 57).
         8. Use of ascorbic/malic acid for leaching based on AMELIE project results (source: Gaeta, p. 30).
+        9. Cost fluctuations are applied as percentages based on the selected scenario:
+           - **Lower Range**: Reagents (-20%), Energy (-15%), Labor (-5%), Maintenance (-10%), Disposal (-10%), Microwave Energy (-10%), Ascorbic Acid (-15%), Wastewater Treatment (-5%).
+           - **Base Range**: No fluctuations applied.
+           - **Upper Range**: Reagents (+20%), Energy (+25%), Labor (+10%), Maintenance (+15%), Disposal (+10%), Microwave Energy (+15%), Ascorbic Acid (+20%), Wastewater Treatment (+10%).
         """
         if scenario_name == "Lower Utility Costs":
             assumptions += """
@@ -107,6 +111,20 @@ class AmelieEconomicModel:
             - 15% reduction in energy costs
             - 5% reduction in labor costs
             - Lower range of cost fluctuations applied
+            """
+        elif scenario_name == "Base Utility Costs":
+            assumptions += """
+            ### Specific Assumptions for Base Utility Costs:
+            - Standard energy consumption and costs
+            - No cost fluctuations applied
+            """
+        elif scenario_name == "Upper Utility Costs":
+            assumptions += """
+            ### Specific Assumptions for Upper Utility Costs:
+            - Increased energy consumption due to inefficiencies
+            - 25% increase in energy costs
+            - 10% increase in labor costs
+            - Upper range of cost fluctuations applied
             """
         return assumptions
 
