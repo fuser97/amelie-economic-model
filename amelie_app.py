@@ -161,15 +161,68 @@ st.subheader("Results")
 st.write(f"**Total CapEx:** {capex_total} EUR")
 st.write(f"**Total OpEx:** {opex_total} EUR/batch")
 
-# CapEx Chart
+# Funzione aggiornata per generare il grafico a torta con miglioramenti
+def generate_improved_pie_chart(data, title):
+    import matplotlib.pyplot as plt
+    import numpy as np
+    from io import BytesIO
+
+    # Riordina i dati per alternare percentuali grandi e piccole
+    def reorder_data(values, labels):
+        sorted_indices = np.argsort(values)  # Indici ordinati
+        small_indices = sorted_indices[:len(values)//2]  # Metà più piccoli
+        large_indices = sorted_indices[len(values)//2:]  # Metà più grandi
+
+        # Alterna piccoli e grandi
+        reordered_indices = np.ravel(np.column_stack((large_indices[::-1], small_indices)))
+        reordered_indices = reordered_indices[~np.isnan(reordered_indices)]  # Rimuove NaN
+        return [values[int(i)] for i in reordered_indices], [labels[int(i)] for i in reordered_indices]
+
+    values = list(data.values())
+    labels = list(data.keys())
+
+    # Riordina i valori e le etichette
+    values, labels = reorder_data(values, labels)
+
+    # Creazione del grafico
+    plt.figure(figsize=(10, 10))
+    wedges, texts, autotexts = plt.pie(
+        values,
+        labels=labels,
+        autopct='%1.1f%%',
+        pctdistance=0.8,            # Posizione dei numeri
+        labeldistance=1.2,          # Posizione delle etichette
+        startangle=140,             # Rotazione iniziale per bilanciare
+        textprops={'fontsize': 10}  # Font leggibile
+    )
+
+    # Aggiunge linee di collegamento per le percentuali piccole
+    for i, (wedge, text) in enumerate(zip(wedges, autotexts)):
+        if values[i] < sum(values) * 0.05:  # Percentuali minori del 5%
+            text.set_horizontalalignment('center')
+            text.set_verticalalignment('center')
+
+    plt.title(title, fontsize=14)
+    plt.axis('equal')  # Mantiene la proporzione
+    plt.tight_layout()
+
+    # Salva il grafico in un buffer
+    buf = BytesIO()
+    plt.savefig(buf, format='png', bbox_inches='tight')
+    buf.seek(0)
+    plt.close()
+    return buf
+
+# Sezione CapEx Chart
 st.subheader("CapEx Breakdown")
-capex_chart_buf = model.generate_pie_chart(model.capex, "CapEx Breakdown")
+capex_chart_buf = generate_improved_pie_chart(model.capex, "CapEx Breakdown")
 st.image(capex_chart_buf, caption="CapEx Pie Chart", use_column_width=True)
 
-# OpEx Chart
+# Sezione OpEx Chart
 st.subheader("OpEx Breakdown")
-opex_chart_buf = model.generate_pie_chart(model.opex, "OpEx Breakdown")
+opex_chart_buf = generate_improved_pie_chart(model.opex, "OpEx Breakdown")
 st.image(opex_chart_buf, caption="OpEx Pie Chart", use_column_width=True)
+
 
 # Display tables
 st.subheader("CapEx Table")
