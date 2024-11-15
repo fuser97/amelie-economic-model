@@ -2,12 +2,6 @@ import streamlit as st
 import matplotlib.pyplot as plt
 import pandas as pd
 import io
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-import pandas as pd
-import os
-
 
 class AmelieEconomicModel:
     def __init__(self):
@@ -44,34 +38,11 @@ class AmelieEconomicModel:
         return capex_total, opex_total
 
     def generate_pie_chart(self, data, title):
-        fig, ax = plt.subplots(figsize=(12, 10))  # Grafico più grande
-        # Esplosione di alcune sezioni per evidenziare
-        explode = [0.1 if key in ["Reagents", "Energy", "Labor"] else 0 for key in data.keys()]
-        wedges, texts, autotexts = ax.pie(
-            data.values(),
-            labels=None,
-            autopct='%1.1f%%',
-            startangle=90,
-            explode=explode
-        )
+        fig, ax = plt.subplots(figsize=(10, 8))  # Increased size
+        ax.pie(data.values(), labels=data.keys(), autopct='%1.1f%%', startangle=90)
         ax.set_title(title, fontsize=16)
-
-        # Aggiunta di una legenda per etichette leggibili
-        ax.legend(
-            loc="upper left",
-            labels=[f"{key} ({value} EUR)" for key, value in data.items()],
-            fontsize=12,
-            bbox_to_anchor=(1, 0.5),
-            frameon=False
-        )
-
-        # Personalizzazione delle percentuali
-        for text in autotexts:
-            text.set_fontsize(14)
-            text.set_color('black')
-
         buf = io.BytesIO()
-        plt.savefig(buf, format='png', bbox_inches="tight")
+        plt.savefig(buf, format='png')
         buf.seek(0)
         return buf
 
@@ -107,7 +78,7 @@ class AmelieEconomicModel:
         4. Energy cost calculated dynamically based on kWh per machine.
         5. Labor includes one operator per batch.
         6. Maintenance and disposal are estimated.
-
+        
         ### Specific Assumptions for {scenario_name}:
         """
         if scenario_name == "Lower Utility Costs":
@@ -119,7 +90,6 @@ class AmelieEconomicModel:
         else:
             assumptions += "No specific assumptions provided."
         return assumptions
-
 
 # Streamlit App
 model = AmelieEconomicModel()
@@ -161,18 +131,15 @@ st.subheader("Results")
 st.write(f"**Total CapEx:** {capex_total} EUR")
 st.write(f"**Total OpEx:** {opex_total} EUR/batch")
 
-# Sezione CapEx Chart
+# CapEx Chart
 st.subheader("CapEx Breakdown")
-capex_chart_buf = generate_improved_pie_chart(model.capex, "CapEx Breakdown")
+capex_chart_buf = model.generate_pie_chart(model.capex, "CapEx Breakdown")
 st.image(capex_chart_buf, caption="CapEx Pie Chart", use_column_width=True)
 
-# Sezione OpEx Chart
+# OpEx Chart
 st.subheader("OpEx Breakdown")
-opex_chart_buf = generate_improved_pie_chart(model.opex, "OpEx Breakdown")
+opex_chart_buf = model.generate_pie_chart(model.opex, "OpEx Breakdown")
 st.image(opex_chart_buf, caption="OpEx Pie Chart", use_column_width=True)
-
-
-
 
 # Display tables
 st.subheader("CapEx Table")
