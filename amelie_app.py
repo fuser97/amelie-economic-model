@@ -48,36 +48,36 @@ class AmelieEconomicModel:
         return capex_total, opex_total
 
         def generate_pie_chart(self, data, title):
-        fig, ax = plt.subplots(figsize=(12, 10))  # Grafico più grande
-        # Esplosione di alcune sezioni per evidenziare
-        explode = [0.1 if key in ["Reagents", "Energy", "Labor"] else 0 for key in data.keys()]
-        wedges, texts, autotexts = ax.pie(
-            data.values(),
-            labels=None,
-            autopct='%1.1f%%',
-            startangle=90,
-            explode=explode
-        )
-        ax.set_title(title, fontsize=16)
+          fig, ax = plt.subplots(figsize=(12, 10))  # Grafico più grande
+          # Esplosione di alcune sezioni per evidenziare
+          explode = [0.1 if key in ["Reagents", "Energy", "Labor"] else 0 for key in data.keys()]
+          wedges, texts, autotexts = ax.pie(
+              data.values(),
+              labels=None,
+              autopct='%1.1f%%',
+              startangle=90,
+              explode=explode
+          )
+          ax.set_title(title, fontsize=16)
 
-        # Aggiunta di una legenda per etichette leggibili
-        ax.legend(
-            loc="upper left",
-            labels=[f"{key} ({value} EUR)" for key, value in data.items()],
-            fontsize=12,
-            bbox_to_anchor=(1, 0.5),
-            frameon=False
-        )
+          # Aggiunta di una legenda per etichette leggibili
+          ax.legend(
+              loc="upper left",
+              labels=[f"{key} ({value} EUR)" for key, value in data.items()],
+              fontsize=12,
+              bbox_to_anchor=(1, 0.5),
+              frameon=False
+          )
 
-        # Personalizzazione delle percentuali
-        for text in autotexts:
-            text.set_fontsize(14)
-            text.set_color('black')
+          # Personalizzazione delle percentuali
+          for text in autotexts:
+              text.set_fontsize(14)
+              text.set_color('black')
 
-        buf = io.BytesIO()
-        plt.savefig(buf, format='png', bbox_inches="tight")
-        buf.seek(0)
-        return buf
+          buf = io.BytesIO()
+          plt.savefig(buf, format='png', bbox_inches="tight")
+          buf.seek(0)
+          return buf
 
     def generate_table(self, data):
         df = pd.DataFrame(list(data.items()), columns=['Category', 'Cost (EUR)'])
