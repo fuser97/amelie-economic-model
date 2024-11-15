@@ -89,21 +89,21 @@ class AmelieEconomicModel:
                     self.opex[cost] *= (1 + fluctuation_percentage / 100)
 
         def get_assumptions(self, scenario_name):
-        assumptions = """
-        ### General Assumptions:
-        1. Pilot project sized for 10 kg BM per batch.
-        2. No infrastructure costs.
-        3. Process: BM pre-treatment (drying), microwave-assisted thermal treatment, leaching in water, precipitation for lithium recovery, secondary drying, leaching in acid (malic acid and hydrogen peroxide), additional precipitation for Co, Ni, and Mn recovery, and wastewater treatment.
-        4. Energy cost calculated dynamically based on kWh per machine.
-        5. Labor includes one operator per batch.
-        6. Maintenance and disposal are estimated.
-        7. Microwave-assisted thermal treatment considered (source: Aznar, p. 57).
-        8. Use of ascorbic/malic acid for leaching based on AMELIE project results (source: Gaeta, p. 30).
-        9. Cost fluctuations are applied as percentages based on the selected scenario:
-           - **Lower Range**: Reagents (-20%), Energy (-15%), Labor (-5%), Maintenance (-10%), Disposal (-10%), Microwave Energy (-10%), Ascorbic Acid (-15%), Wastewater Treatment (-5%).
-           - **Base Range**: No fluctuations applied.
-           - **Upper Range**: Reagents (+20%), Energy (+25%), Labor (+10%), Maintenance (+15%), Disposal (+10%), Microwave Energy (+15%), Ascorbic Acid (+20%), Wastewater Treatment (+10%).
-        """
+          assumptions = """
+          ### General Assumptions:
+          1. Pilot project sized for 10 kg BM per batch.
+          2. No infrastructure costs.
+          3. Process: BM pre-treatment (drying), microwave-assisted thermal treatment, leaching in water, precipitation for lithium recovery, secondary drying, leaching in acid (malic acid and hydrogen peroxide), additional precipitation for Co, Ni, and Mn recovery, and wastewater treatment.
+          4. Energy cost calculated dynamically based on kWh per machine.
+          5. Labor includes one operator per batch.
+          6. Maintenance and disposal are estimated.
+          7. Microwave-assisted thermal treatment considered (source: Aznar, p. 57).
+          8. Use of ascorbic/malic acid for leaching based on AMELIE project results (source: Gaeta, p. 30).
+          9. Cost fluctuations are applied as percentages based on the selected scenario:
+             - **Lower Range**: Reagents (-20%), Energy (-15%), Labor (-5%), Maintenance (-10%), Disposal (-10%), Microwave Energy (-10%), Ascorbic Acid (-15%), Wastewater Treatment (-5%).
+             - **Base Range**: No fluctuations applied.
+             - **Upper Range**: Reagents (+20%), Energy (+25%), Labor (+10%), Maintenance (+15%), Disposal (+10%), Microwave Energy (+15%), Ascorbic Acid (+20%), Wastewater Treatment (+10%).
+          """
         if scenario_name == "Lower Utility Costs":
             assumptions += """
             ### Specific Assumptions for Lower Utility Costs:
