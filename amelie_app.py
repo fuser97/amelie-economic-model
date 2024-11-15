@@ -47,7 +47,7 @@ class AmelieEconomicModel:
         opex_total = sum(self.opex.values())
         return capex_total, opex_total
 
-        def generate_pie_chart(self, data, title):
+    def generate_pie_chart(self, data, title):
           fig, ax = plt.subplots(figsize=(12, 10))  # Grafico più grande
           # Esplosione di alcune sezioni per evidenziare
           explode = [0.1 if key in ["Reagents", "Energy", "Labor"] else 0 for key in data.keys()]
