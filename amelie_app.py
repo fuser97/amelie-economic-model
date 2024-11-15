@@ -122,35 +122,35 @@ class AmelieEconomicModel:
            - Wastewater Treatment: +10%
       """
 
-    # Specific assumptions based on the scenario
-    if scenario_name == "Lower Utility Costs":
-        assumptions += """
-        ### Specific Assumptions for Lower Utility Costs:
-        - Reduced energy consumption due to optimized operations.
-        - 15% reduction in energy costs.
-        - 5% reduction in labor costs.
-        - Lower range of cost fluctuations applied.
-        """
-    elif scenario_name == "Base Utility Costs":
-        assumptions += """
-        ### Specific Assumptions for Base Utility Costs:
-        - Standard energy consumption and costs.
-        - No cost fluctuations applied.
-        """
-    elif scenario_name == "Upper Utility Costs":
-        assumptions += """
-        ### Specific Assumptions for Upper Utility Costs:
-        - Increased energy consumption due to inefficiencies.
-        - 25% increase in energy costs.
-        - 10% increase in labor costs.
-        - Upper range of cost fluctuations applied.
-        """
-    else:
-        assumptions += """
-        ### Specific Assumptions:
-        - No specific assumptions provided for this scenario.
-        """
-    return assumptions
+      # Specific assumptions based on the scenario
+      if scenario_name == "Lower Utility Costs":
+          assumptions += """
+          ### Specific Assumptions for Lower Utility Costs:
+          - Reduced energy consumption due to optimized operations.
+          - 15% reduction in energy costs.
+          - 5% reduction in labor costs.
+          - Lower range of cost fluctuations applied.
+          """
+      elif scenario_name == "Base Utility Costs":
+          assumptions += """
+          ### Specific Assumptions for Base Utility Costs:
+          - Standard energy consumption and costs.
+          - No cost fluctuations applied.
+          """
+      elif scenario_name == "Upper Utility Costs":
+          assumptions += """
+          ### Specific Assumptions for Upper Utility Costs:
+          - Increased energy consumption due to inefficiencies.
+          - 25% increase in energy costs.
+          - 10% increase in labor costs.
+          - Upper range of cost fluctuations applied.
+          """
+      else:
+          assumptions += """
+          ### Specific Assumptions:
+          - No specific assumptions provided for this scenario.
+          """
+      return assumptions
 
 
 
