@@ -161,45 +161,6 @@ st.subheader("Results")
 st.write(f"**Total CapEx:** {capex_total} EUR")
 st.write(f"**Total OpEx:** {opex_total} EUR/batch")
 
-# Funzione aggiornata per generare il grafico a torta con miglioramenti
-def generate_improved_pie_chart(data, title):
-    import matplotlib.pyplot as plt
-    import numpy as np
-    from io import BytesIO
-
-    # Riordina i dati per alternare percentuali grandi e piccole
-    def reorder_data(values, labels):
-        sorted_indices = np.argsort(values)  # Indici ordinati
-        small_indices = sorted_indices[:len(values)//2]  # Metà più piccoli
-        large_indices = sorted_indices[len(values)//2:]  # Metà più grandi
-
-        # Alterna piccoli e grandi
-        reordered_indices = np.ravel(np.column_stack((large_indices[::-1], small_indices)))
-        reordered_indices = reordered_indices[~np.isnan(reordered_indices)]  # Rimuove NaN
-        return [values[int(i)] for i in reordered_indices], [labels[int(i)] for i in reordered_indices]
-
-    values = list(data.values())
-    labels = list(data.keys())
-
-    # Riordina i valori e le etichette
-    values, labels = reorder_data(values, labels)
-
-    # Creazione del grafico
-    plt.figure(figsize=(10, 10))
-    wedges, texts, autotexts = plt.pie(
-        values,
-        labels=labels,
-        autopct='%1.1f%%',
-        pctdistance=0.8,            # Posizione dei numeri
-        labeldistance=1.2,          # Posizione delle etichette
-        startangle=140,             # Rotazione iniziale per bilanciare
-        textprops={'fontsize': 10}  # Font leggibile
-    )
-
-
-
-
-
 # Sezione CapEx Chart
 st.subheader("CapEx Breakdown")
 capex_chart_buf = generate_improved_pie_chart(model.capex, "CapEx Breakdown")
