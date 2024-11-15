@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import io
 
-
 class AmelieEconomicModel:
     def __init__(self):
         self.capex = {
@@ -31,6 +30,16 @@ class AmelieEconomicModel:
             'Co/Ni/Mn Precipitation Reagents': 7.0,
             'Wastewater Treatment Chemicals': 6.0
         }
+        self.cost_fluctuations = {
+            'Reagents': {'Lower': -20, 'Base': 0, 'Upper': 20},
+            'Energy': {'Lower': -15, 'Base': 0, 'Upper': 25},
+            'Labor': {'Lower': -5, 'Base': 0, 'Upper': 10},
+            'Maintenance': {'Lower': -10, 'Base': 0, 'Upper': 15},
+            'Disposal': {'Lower': -10, 'Base': 0, 'Upper': 10},
+            'Microwave Energy': {'Lower': -10, 'Base': 0, 'Upper': 15},
+            'Ascorbic Acid': {'Lower': -15, 'Base': 0, 'Upper': 20},
+            'Wastewater Treatment': {'Lower': -5, 'Base': 0, 'Upper': 10}
+        }
         self.scenarios = {}
 
     def calculate_totals(self):
@@ -41,16 +50,13 @@ class AmelieEconomicModel:
     def generate_pie_chart(self, data, title):
         values = list(data.values())
         labels = list(data.keys())
-
         fig, ax = plt.subplots(figsize=(12, 8))
         wedges, texts, autotexts = ax.pie(
             values, labels=labels, autopct='%1.1f%%', startangle=90, labeldistance=1.1,
             pctdistance=0.85, textprops={'fontsize': 10}, wedgeprops={'linewidth': 1, 'edgecolor': 'white'}
         )
-
         ax.set_title(title, fontsize=16, pad=20)
         plt.tight_layout()
-
         buf = io.BytesIO()
         plt.savefig(buf, format='png', bbox_inches='tight', dpi=300)
         buf.seek(0)
@@ -63,11 +69,11 @@ class AmelieEconomicModel:
         df.loc[len(df)] = ['Total', total]
         return df
 
-    def add_scenario(self, name, capex_changes, opex_percentage_changes, energy_cost_variation=None):
+    def add_scenario(self, name, capex_changes, opex_percentage_changes, fluctuation_type):
         self.scenarios[name] = {
             'CapEx': capex_changes,
             'OpExPercentage': opex_percentage_changes,
-            'EnergyCostVariation': energy_cost_variation
+            'FluctuationType': fluctuation_type
         }
 
     def apply_scenario(self, name):
@@ -77,25 +83,31 @@ class AmelieEconomicModel:
                 self.capex[key] = self.capex.get(key, 0) + change
             for key, percentage_change in scenario['OpExPercentage'].items():
                 self.opex[key] *= (1 + percentage_change / 100)
-            if scenario.get('EnergyCostVariation') is not None:
-                self.opex['Energy'] *= (1 + scenario['EnergyCostVariation'] / 100)
+            for cost, fluctuation in self.cost_fluctuations.items():
+                fluctuation_percentage = fluctuation[scenario['FluctuationType']]
+                if cost in self.opex:
+                    self.opex[cost] *= (1 + fluctuation_percentage / 100)
 
     def get_assumptions(self, scenario_name):
-        assumptions = f"""
+        assumptions = """
         ### General Assumptions:
         1. Pilot project sized for 10 kg BM per batch.
         2. No infrastructure costs.
-        3. Process includes BM pre-treatment, microwave-assisted thermal treatment, leaching in water and acid, precipitation, and wastewater treatment.
+        3. Process: BM pre-treatment (drying), microwave-assisted thermal treatment, leaching in water, precipitation for lithium recovery, secondary drying, leaching in acid (malic acid and hydrogen peroxide), additional precipitation for Co, Ni, and Mn recovery, and wastewater treatment.
         4. Energy cost calculated dynamically based on kWh per machine.
         5. Labor includes one operator per batch.
         6. Maintenance and disposal are estimated.
+        7. Microwave-assisted thermal treatment considered (source: Aznar, p. 57).
+        8. Use of ascorbic/malic acid for leaching based on AMELIE project results (source: Gaeta, p. 30).
         """
         if scenario_name == "Lower Utility Costs":
-            assumptions += "- Reduced energy consumption.\n- 15% reduction in energy costs.\n- 5% reduction in labor costs."
-        elif scenario_name == "Base Utility Costs":
-            assumptions += "- Standard energy consumption and costs."
-        elif scenario_name == "Upper Utility Costs":
-            assumptions += "- Increased energy consumption.\n- 25% increase in energy costs.\n- 10% increase in labor costs."
+            assumptions += """
+            ### Specific Assumptions for Lower Utility Costs:
+            - Reduced energy consumption due to optimized operations
+            - 15% reduction in energy costs
+            - 5% reduction in labor costs
+            - Lower range of cost fluctuations applied
+            """
         return assumptions
 
 
@@ -106,20 +118,20 @@ model = AmelieEconomicModel()
 model.add_scenario(
     "Lower Utility Costs",
     capex_changes={},
-    opex_percentage_changes={"Energy": -15, "Labor": -5},
-    energy_cost_variation=-15
+    opex_percentage_changes={"Labor": -5},
+    fluctuation_type="Lower"
 )
 model.add_scenario(
     "Base Utility Costs",
     capex_changes={},
     opex_percentage_changes={},
-    energy_cost_variation=0
+    fluctuation_type="Base"
 )
 model.add_scenario(
     "Upper Utility Costs",
     capex_changes={},
-    opex_percentage_changes={"Energy": 25, "Labor": 10},
-    energy_cost_variation=25
+    opex_percentage_changes={"Labor": 10},
+    fluctuation_type="Upper"
 )
 
 st.title("Amelie Economic Model")
