@@ -58,7 +58,7 @@ class AmelieEconomicModel:
         ax.set_title(title, fontsize=16, pad=20)
         plt.tight_layout()
         buf = io.BytesIO()
-        plt.savefig(buf, format='png', bbox_inches='tight', dpi=300)
+        plt.savefig(buf, format='png', bbox_inches='tight', dpi=150)
         buf.seek(0)
         plt.close()
         return buf
