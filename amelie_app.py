@@ -38,13 +38,58 @@ class AmelieEconomicModel:
         return capex_total, opex_total
 
     def generate_pie_chart(self, data, title):
-        fig, ax = plt.subplots(figsize=(10, 8))  # Increased size
-        ax.pie(data.values(), labels=data.keys(), autopct='%1.1f%%', startangle=90)
-        ax.set_title(title, fontsize=16)
-        buf = io.BytesIO()
-        plt.savefig(buf, format='png')
-        buf.seek(0)
-        return buf
+    # Alterna valori grandi e piccoli
+    values = list(data.values())
+    labels = list(data.keys())
+    
+    # Crea una lista di indici alternati (grande-piccolo)
+    sorted_indices = sorted(range(len(values)), key=lambda k: values[k], reverse=True)
+    reordered_indices = []
+    for i in range(len(sorted_indices)):
+        if i % 2 == 0:
+            reordered_indices.append(sorted_indices[i//2])
+        else:
+            reordered_indices.append(sorted_indices[-(i//2 + 1)])
+    
+    # Riordina i dati secondo il nuovo ordine
+    values = [values[i] for i in reordered_indices]
+    labels = [labels[i] for i in reordered_indices]
+    
+    fig, ax = plt.subplots(figsize=(12, 8))
+    
+    # Crea il grafico a torta con etichette esterne
+    wedges, texts, autotexts = ax.pie(values, 
+                                     labels=labels,
+                                     autopct='%1.1f%%',
+                                     startangle=90,
+                                     labeldistance=1.2,  # Sposta le etichette più lontano
+                                     pctdistance=0.85,
+                                     rotatelabels=False)
+    
+    # Aggiungi le linee di collegamento
+    ax.set_title(title, fontsize=16, pad=20)
+    
+    # Aggiungi una legenda separata
+    ax.legend(wedges, labels,
+             title=title,
+             loc="center left",
+             bbox_to_anchor=(1, 0, 0.5, 1))
+    
+    # Personalizza il testo
+    plt.setp(autotexts, size=8, weight="bold")
+    plt.setp(texts, size=8)
+    
+    # Aggiungi le linee di collegamento
+    for autotext in autotexts:
+        autotext.set_color('black')
+    
+    plt.tight_layout()
+    
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png', bbox_inches='tight', dpi=300)
+    buf.seek(0)
+    plt.close()
+    return buf
 
     def generate_table(self, data, title):
         df = pd.DataFrame(list(data.items()), columns=['Category', 'Cost (EUR)'])
