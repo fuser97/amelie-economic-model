@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import io
 
+
 class AmelieEconomicModel:
     def __init__(self):
         self.capex = {
@@ -38,60 +39,25 @@ class AmelieEconomicModel:
         return capex_total, opex_total
 
     def generate_pie_chart(self, data, title):
-        # Alterna valori grandi e piccoli
         values = list(data.values())
         labels = list(data.keys())
-        
-        # Crea una lista di indici alternati (grande-piccolo)
-        sorted_indices = sorted(range(len(values)), key=lambda k: values[k], reverse=True)
-        reordered_indices = []
-        for i in range(len(sorted_indices)):
-            if i % 2 == 0:
-                reordered_indices.append(sorted_indices[i//2])
-            else:
-                reordered_indices.append(sorted_indices[-(i//2 + 1)])
-        
-        # Riordina i dati secondo il nuovo ordine
-        values = [values[i] for i in reordered_indices]
-        labels = [labels[i] for i in reordered_indices]
-        
+
         fig, ax = plt.subplots(figsize=(12, 8))
-        
-        # Crea il grafico a torta con etichette esterne
-        wedges, texts, autotexts = ax.pie(values, 
-                                         labels=labels,
-                                         autopct='%1.1f%%',
-                                         startangle=90,
-                                         labeldistance=1.2,  # Sposta le etichette più lontano
-                                         pctdistance=0.85,
-                                         rotatelabels=False)
-        
-        # Aggiungi le linee di collegamento
+        wedges, texts, autotexts = ax.pie(
+            values, labels=labels, autopct='%1.1f%%', startangle=90, labeldistance=1.1,
+            pctdistance=0.85, textprops={'fontsize': 10}, wedgeprops={'linewidth': 1, 'edgecolor': 'white'}
+        )
+
         ax.set_title(title, fontsize=16, pad=20)
-        
-        # Aggiungi una legenda separata
-        ax.legend(wedges, labels,
-                 title=title,
-                 loc="center left",
-                 bbox_to_anchor=(1, 0, 0.5, 1))
-        
-        # Personalizza il testo
-        plt.setp(autotexts, size=8, weight="bold")
-        plt.setp(texts, size=8)
-        
-        # Aggiungi le linee di collegamento
-        for autotext in autotexts:
-            autotext.set_color('black')
-        
         plt.tight_layout()
-        
+
         buf = io.BytesIO()
         plt.savefig(buf, format='png', bbox_inches='tight', dpi=300)
         buf.seek(0)
         plt.close()
         return buf
 
-    def generate_table(self, data, title):
+    def generate_table(self, data):
         df = pd.DataFrame(list(data.items()), columns=['Category', 'Cost (EUR)'])
         total = df['Cost (EUR)'].sum()
         df.loc[len(df)] = ['Total', total]
@@ -123,8 +89,6 @@ class AmelieEconomicModel:
         4. Energy cost calculated dynamically based on kWh per machine.
         5. Labor includes one operator per batch.
         6. Maintenance and disposal are estimated.
-        
-        ### Specific Assumptions for {scenario_name}:
         """
         if scenario_name == "Lower Utility Costs":
             assumptions += "- Reduced energy consumption.\n- 15% reduction in energy costs.\n- 5% reduction in labor costs."
@@ -132,9 +96,8 @@ class AmelieEconomicModel:
             assumptions += "- Standard energy consumption and costs."
         elif scenario_name == "Upper Utility Costs":
             assumptions += "- Increased energy consumption.\n- 25% increase in energy costs.\n- 10% increase in labor costs."
-        else:
-            assumptions += "No specific assumptions provided."
         return assumptions
+
 
 # Streamlit App
 model = AmelieEconomicModel()
@@ -188,9 +151,9 @@ st.image(opex_chart_buf, caption="OpEx Pie Chart", use_column_width=True)
 
 # Display tables
 st.subheader("CapEx Table")
-capex_table = model.generate_table(model.capex, "CapEx Breakdown")
+capex_table = model.generate_table(model.capex)
 st.table(capex_table)
 
 st.subheader("OpEx Table")
-opex_table = model.generate_table(model.opex, "OpEx Breakdown")
+opex_table = model.generate_table(model.opex)
 st.table(opex_table)
