@@ -50,7 +50,7 @@ class AmelieEconomicModel:
     def generate_pie_chart(self, data, title):
         values = list(data.values())
         labels = list(data.keys())
-        fig, ax = plt.subplots(figsize=(12, 8))
+        fig, ax = plt.subplots(figsize=(14, 10))
         wedges, texts, autotexts = ax.pie(
             values, labels=labels, autopct='%1.1f%%', startangle=90, labeldistance=1.1,
             pctdistance=0.85, textprops={'fontsize': 10}, wedgeprops={'linewidth': 1, 'edgecolor': 'white'}
